@@ -1,4 +1,5 @@
-import { GetServerSideProps } from 'next'
+// import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import Head from 'next/head'
 
 import { SubscribeButton } from '../components/SubscribeButton'
@@ -10,6 +11,51 @@ interface HomeProps {
   product: {
     priceId: string;
     amount: number;
+  }
+}
+
+// Client-Side Rendering -> quando não é preciso de indexação, quando é uma informação carregada através de ação do usuário
+// Server-Side Rendering -> quando é necessário utilizar informações do usuário que acessa a página, em tempo real
+// Static Site Generation -> casos em que é possível gerar o html de uma página e compartilhá-lo com todos usuários
+
+// exemplo: Post do blog
+// Conteúdo do Post -> SSG
+// Comentários -> Client-Side Rendering
+
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   const price = await stripe.prices.retrieve('price_1JJM0DH3LDGqzEKUaETQxwH8')
+
+//   const product = {
+//     priceId: price.id,
+//     amount: new Intl.NumberFormat('en-US', {
+//       style: 'currency',
+//       currency: 'USD'
+//     }).format(price.unit_amount / 100),
+//   }
+
+//   return {
+//     props: {
+//       product
+//     }
+//   }
+// }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const price = await stripe.prices.retrieve('price_1JJM0DH3LDGqzEKUaETQxwH8')
+
+  const product = {
+    priceId: price.id,
+    amount: new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(price.unit_amount / 100),
+  }
+
+  return {
+    props: {
+      product
+    },
+    revalidate: 60 * 60 * 24, // 24 hours
   }
 }
 
@@ -35,22 +81,4 @@ export default function Home({ product }: HomeProps) {
       </main>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const price = await stripe.prices.retrieve('price_1JJM0DH3LDGqzEKUaETQxwH8')
-
-  const product = {
-    priceId: price.id,
-    amount: new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(price.unit_amount / 100),
-  }
-
-  return {
-    props: {
-      product
-    }
-  }
 }
