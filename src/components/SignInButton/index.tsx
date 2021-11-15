@@ -13,7 +13,7 @@ export function SignInButton() {
       className={styles.signInButton}
     >
       <FaGithub color="#04d361" />
-      Sign in with Github
+        Thiago Rovetta
       <FiX color="#737380" className={styles.closeIcon} />
     </button>
   )
