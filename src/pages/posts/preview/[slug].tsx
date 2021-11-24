@@ -1,10 +1,10 @@
-import { GetStaticProps } from 'next'
+import { useEffect } from 'react';
+import { GetStaticPaths, GetStaticProps } from 'next'
 import { useSession } from 'next-auth/client';
+import {useRouter} from 'next/router';
 import Head from 'next/head'
 import Link from 'next/link'
-import {useRouter} from 'next/router';
 import { RichText } from 'prismic-dom';
-import { useEffect } from 'react';
 
 import { getPrismicClient } from '../../../services/prismic';
 
@@ -19,10 +19,21 @@ interface PostPreviewProps {
   }
 }
 
-export const getStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths = async () => {
+
   return {
     paths: [],
     fallback: 'blocking'
+    // fallback: true -> se tentar acessar uma pagina que ainda
+    // nao foi gerada de forma estatica, carrega o conteudo pelo
+    // lado do cliente.
+
+    // fallback: false -> se tentar acessar uma pagina que ainda
+    // nao foi gerada de forma estatica, retorna 404
+
+    // fallback: 'blocking' -> se tentar acessar uma pagina que ainda
+    // nao foi gerada de forma estatica, tentar carregar o conteudo
+    // na camada next (SSR)
   }
 }
 
@@ -56,7 +67,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       post
-    }
+    },
+    revalidate: 60 * 30, // 30 minutos
   }
 }
 
