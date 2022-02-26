@@ -1,6 +1,7 @@
 import { GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useSession } from 'next-auth/client';
 import Prismic from '@prismicio/client'
 import { RichText } from 'prismic-dom'
 
@@ -50,6 +51,8 @@ export const getStaticProps: GetStaticProps = async () => {
 }
 
 export default function Posts({ posts }: PostProps) {
+  const [session] = useSession()
+  
   return (
     <>
       <Head>
@@ -60,7 +63,7 @@ export default function Posts({ posts }: PostProps) {
         <div className={styles.posts}>
           {
             posts.map(post => (
-              <Link href={`/posts/${post.slug}`} key={post.slug}>
+              <Link href={`/posts/${session?.activeSubscription ? '' : 'preview/'}${post.slug}`} key={post.slug}>
                 <a>
                   <time>{post.updatedAt}</time>
                   <strong>{post.title}</strong>
